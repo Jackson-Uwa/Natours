@@ -4,18 +4,23 @@ const app = express();
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./utils/globalError");
 const connectDB = require("./config/db");
-
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const xss = require("xss-clean");
 const hpp = require("hpp");
 const mongoSanitize = require("express-mongo-sanitize");
-// const { application } = require("express");
+
+const path = require("path");
+
+// Connect to DataBase
 connectDB();
 
+app.set("view engine", "pug");
+app.set("views", path.join(__dirname, "views"));
+app.use(express.static(path.join(__dirname, "..", "public")));
+// app.use(express.static(`${__dirname}/../public`));
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: false }));
-app.use(express.static(`${__dirname}/../public`));
 
 // app.use((req, res, next) => {
 //   console.log(req.headers);
@@ -47,6 +52,10 @@ const limiter = rateLimit({
 app.use("/api", limiter);
 
 //endpoints and resources
+
+app.use("/", require("./routes/view"));
+
+app.use("/api/v1/reviews", require("./routes/reviews"));
 app.use("/api/v1/users", require("./routes/users"));
 app.use("/api/v1/tours", require("./routes/tours"));
 

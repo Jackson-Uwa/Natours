@@ -65,9 +65,12 @@ const getTours = catchAsync(async (req, res) => {
 });
 
 const getTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id);
-  // if (!tour)
-  //   return next(new AppError(`No user with id: ${req.params.id}`, 401));
+  const tour = await Tour.findById(req.params.id).populate({
+    path: "reviews",
+    select: "-__v",
+  });
+  if (!tour)
+    return next(new AppError(`No user with id: ${req.params.id}`, 401));
   res.status(200).json({
     status: "success",
     data: {

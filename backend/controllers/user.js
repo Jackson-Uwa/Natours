@@ -30,6 +30,7 @@ const updateMe = catchAsync(async (req, res, next) => {
       user: updatedUser,
     },
   });
+  next();
 });
 
 const deleteMe = catchAsync(async (req, res, next) => {
@@ -38,6 +39,7 @@ const deleteMe = catchAsync(async (req, res, next) => {
     status: "success",
     data: null,
   });
+  next();
 });
 
 module.exports = {

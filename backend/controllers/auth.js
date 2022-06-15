@@ -1,10 +1,36 @@
 const jwt = require("jsonwebtoken");
+// const util = require("util");
 const User = require("../models/users");
-const { promisify } = require("util");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const sendEmail = require("../utils/email");
 const crypto = require("crypto");
+
+const signToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+};
+
+const createSendToken = (user, statusCode, res) => {
+  token = signToken(user._id);
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true,
+  };
+  if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
+
+  res.cookie("jwt", token, cookieOptions);
+  res.status(statusCode).json({
+    status: "success",
+    token,
+    data: {
+      user,
+    },
+  });
+};
 
 const getUsers = catchAsync(async (req, res) => {
   const users = await User.find();
@@ -19,28 +45,11 @@ const getUsers = catchAsync(async (req, res) => {
 
 const getUser = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.params.id);
-  res.json({
+  res.status(200).json({
     status: "success",
     data: user,
   });
 });
-
-const signToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
-  });
-};
-
-const createSendToken = (user, statusCode, res) => {
-  token = signToken(user._id);
-  res.status(statusCode).json({
-    status: "success",
-    token,
-    data: {
-      user,
-    },
-  });
-};
 
 const signUp = catchAsync(async (req, res) => {
   const newUser = await User.create({
@@ -65,36 +74,18 @@ const logIn = catchAsync(async (req, res, next) => {
   createSendToken(user, 200, res);
 });
 
-const protect = catchAsync(async (req, res, next) => {
-  let token;
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
-    token = req.headers.authorization.split(" ")[1];
-  }
+const verify = catchAsync(async (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  if (!authHeader)
+    return next(
+      new AppError("You are not logged in! Please Log In to get access")
+    );
+  const token = authHeader.split(" ")[1];
   // console.log(token);
-  if (!token) {
-    return next(
-      new AppError("You are not logged in, please log in to get access")
-    );
-  }
-
-  //verify token
-  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-  const currentUser = await User.findById(decoded.id);
-  if (!currentUser) {
-    return next(
-      new AppError("The user of this token does no longer exist.", 401)
-    );
-  }
-  if (currentUser.changedPasswordAfter(decoded.iat)) {
-    return next(
-      new AppError("User recently changed password! please login again", 401)
-    );
-  }
-  // pass data through middleware
-  req.user = currentUser;
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) return res.status(403);
+    req.user = decoded;
+  });
   next();
 });
 
@@ -151,7 +142,7 @@ const forgotPassword = catchAsync(async (req, res, next) => {
   }
 });
 
-const resetPassword = async (req, res, next) => {
+const resetPassword = catchAsync(async (req, res, next) => {
   const hashedToken = crypto
     .createHash("sha256")
     .update(req.params.token)
@@ -169,7 +160,7 @@ const resetPassword = async (req, res, next) => {
   user.passwordResetExpires = undefined;
   await user.save();
   createSendToken(user, 200, res);
-};
+});
 
 const updatePassword = catchAsync(async (req, res, next) => {
   // 1) Get user from collection
@@ -193,7 +184,7 @@ module.exports = {
   getUser,
   signUp,
   logIn,
-  protect,
+  verify,
   restrictTo,
   forgotPassword,
   resetPassword,

@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { protect, restrictTo } = require("../controllers/auth");
+const { verify, restrictTo } = require("../controllers/auth");
 
 const {
   getTours,
@@ -11,17 +11,19 @@ const {
   TopCheapTours,
 } = require("../controllers/tours");
 
+router.use(verify);
+
 //middleware to get cheapest tours
-router.get("/top-cheap-tours", protect, TopCheapTours, getTours);
+router.get("/top-cheap-tours", TopCheapTours, getTours);
 
-router.get("/", protect, getTours);
+router.get("/", getTours);
 
-router.get("/:id", protect, getTour);
+router.get("/:id", getTour);
 
-router.post("/", protect, createTour);
+router.post("/", createTour);
 
-router.patch("/:id", protect, updateTour);
+router.patch("/:id", updateTour);
 
-router.delete("/:id", protect, restrictTo("admin"), deleteTour);
+router.delete("/:id", deleteTour);
 
 module.exports = router;
