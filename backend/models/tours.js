@@ -107,14 +107,16 @@ const tourSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
-    reviews: {
-      type: mongoose.Schema.ObjectId,
-      ref: "Review",
-    },
+    reviews: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "Review",
+      },
+    ],
   },
   {
     toJSON: { virtuals: true },
-    toObject: { virtuals: true },
+    toObject: { virtuals: true }, 
   }
 );
 
@@ -135,14 +137,13 @@ tourSchema.virtual("reviews", {
 tourSchema.pre(/^find/, function (next) {
   this.populate({
     path: "guides",
-    select:
-      "-__v, -passwordChangedAt -passwordResetToken -passwordResetExpires",
+    select: "-__v -passwordChangedAt -passwordResetToken -passwordResetExpires",
   });
 
-  // this.populate({
-  //   path: "reviews",
-  //   select: "-__v",
-  // });
+  this.populate({
+    path: "reviews",
+    select: "-__v",
+  });
 
   next();
 });

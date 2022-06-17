@@ -43,8 +43,22 @@ const getUsers = catchAsync(async (req, res) => {
   });
 });
 
+const patchUser = catchAsync(async (req, res, next) => {
+  const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+  res.status(201).json({
+    status: 'success',
+    user: user
+  })
+});
+
 const getUser = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.params.id);
+  if(!user){
+    return next(new AppError(`No user with ID ${req.params.id}`))
+  }
   res.status(200).json({
     status: "success",
     data: user,
@@ -182,6 +196,7 @@ const updatePassword = catchAsync(async (req, res, next) => {
 module.exports = {
   getUsers,
   getUser,
+  patchUser,
   signUp,
   logIn,
   verify,

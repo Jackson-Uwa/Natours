@@ -4,6 +4,7 @@ const router = express.Router();
 const {
   getUsers,
   getUser,
+  patchUser,
   signUp,
   logIn,
   verify,
@@ -27,5 +28,6 @@ router.delete("/delete-me", deleteMe);
 
 router.get("/", getUsers);
 router.get("/:id", getUser);
+router.patch("/:id", patchUser);
 
 module.exports = router;

@@ -17,6 +17,21 @@ exports.getReviews = catchAsync(async (req, res, next) => {
   next();
 });
 
+exports.getReview = catchAsync(async (req, res, next) => {
+  const review = await Review.findById(req.params.id);
+  if (!review) {
+    return next(
+      new AppError(`No review matching this ID ${req.params.id}`, 403)
+    );
+  }
+  console.log("review");
+  res.status(200).json({
+    status: "success",
+    data: review,
+  });
+  next();
+});
+
 exports.addReview = catchAsync(async (req, res, next) => {
   const newReview = await Review.create(req.body);
   if (!newReview.review || !newReview.rating) {
@@ -27,6 +42,17 @@ exports.addReview = catchAsync(async (req, res, next) => {
     newData: newReview,
   });
   next();
+});
+
+exports.patchReview = catchAsync(async (req, res, next) => {
+  const upForPatch = await Review.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+  res.status(200).json({
+    status: "success",
+    patchUser: upForPatch,
+  });
 });
 
 // module.exports = {

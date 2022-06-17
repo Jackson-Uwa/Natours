@@ -14,20 +14,16 @@ const reviewSchema = new mongoose.Schema(
       max: 5,
     },
     createdAt: { type: Date, default: Date.now(), select: false },
-    tour: [
-      {
-        type: mongoose.Schema.ObjectId,
-        ref: "Tour",
-        required: [true, "Review must belong to a tour"],
-      },
-    ],
-    user: [
-      {
-        type: mongoose.Schema.ObjectId,
-        ref: "User",
-        required: [true, "Review must belong to a user"],
-      },
-    ],
+    tour: {
+      type: mongoose.Schema.ObjectId,
+      ref: "Tour",
+      required: [true, "Review must belong to a tour"],
+    },
+    user: {
+      type: mongoose.Schema.ObjectId,
+      ref: "User",
+      required: [true, "Review must belong to a user"],
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -35,18 +31,25 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
-reviewSchema.pre("save", async function (next) {
-  const tours = this.tour.map(async (id) => await Tour.findById(id));
-  const users = this.user.map(async (id) => await User.findById(id));
-  this.tour = await Promise.all(tours);
-  this.user = await Promise.all(users);
-});
+// reviewSchema.pre("save", async function (next) {
+//   const tours = this.tour.map(async (id) => await Tour.findById(id));
+//   this.tour = await Promise.all(tours);
+//   next()
+// });
+
+// reviewSchema.pre("save", async function (next) {
+//   const users = this.user.map(async (id) => await User.findById(id));
+//   this.user = await Promise.all(users);
+//   next()
+// });
+
 
 reviewSchema.pre(/^find/, function (next) {
   // this.populate({
   //   path: "tour",
   //   select: "-__v",
   // });
+
   this.populate({
     path: "user",
     select: "-__v -passwordChangedAt -passwordResetExpires -passwordResetToken",
