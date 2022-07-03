@@ -9,7 +9,7 @@ const tourSchema = new mongoose.Schema(
       required: [true, "A tour must have a name"],
       unique: true,
       trim: true,
-      maxlength: [40, "A tour name must not be more tha 40 char"],
+      maxlength: [40, "A tour name must not be more than 40 char"],
       minlength: [10, "A tour name must not be less than 10 char"],
     },
     duration: {
@@ -116,7 +116,7 @@ const tourSchema = new mongoose.Schema(
   },
   {
     toJSON: { virtuals: true },
-    toObject: { virtuals: true }, 
+    toObject: { virtuals: true },
   }
 );
 

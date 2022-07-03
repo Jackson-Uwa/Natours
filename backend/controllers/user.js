@@ -14,7 +14,8 @@ const updateMe = catchAsync(async (req, res, next) => {
   if (req.body.password || req.body.confirmPassword) {
     return next(
       new AppError(
-        "This route is not for password updates. Please use /update-my-password."
+        "This route is not for password updates. Please use /update-my-password.",
+        401
       )
     );
   }

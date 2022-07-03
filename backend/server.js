@@ -11,6 +11,8 @@ const hpp = require("hpp");
 const mongoSanitize = require("express-mongo-sanitize");
 
 const path = require("path");
+const cors = require("cors");
+const cookieParser = require('cookie-parser')
 
 // Connect to DataBase
 connectDB();
@@ -20,10 +22,17 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "..", "public")));
 // app.use(express.static(`${__dirname}/../public`));
 app.use(express.json({ limit: "10kb" }));
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
+app.use(
+  cors({
+    origin: "*",
+    credentials: true,
+  })
+);
 
+app.use(cookieParser());
 // app.use((req, res, next) => {
-//   console.log(req.headers);
+//   console.log(req.cookies);
 //   next();
 // });
 
@@ -61,7 +70,16 @@ app.use("/api/v1/tours", require("./routes/tours"));
 
 //operational error to handle undefined routes
 app.all("*", (req, res, next) => {
-  next(new AppError(`Cant find ${req.originalUrl} on this server!`, 404));
+  // next(new AppError(`Cant find ${req.originalUrl} on this server!`, 404));
+  if (req.accepts("json")) {
+    res.render('error', {title: "Page 404"})
+  }
+  if (req.accepts("html")) {
+    res.sendFile(path.join(__dirname, "views", "404.html"));
+  } else {
+    res.type("txt").send("404, Not Found");
+  }
+  next();
 });
 
 app.use(globalErrorHandler);

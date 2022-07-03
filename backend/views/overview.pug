@@ -20,7 +20,7 @@ block content
                         .card__data
                             svg.card__icon
                                 use(xlink:href='/img/icons.svg#icon-map-pin')
-                            span= tour.startLocation.desription
+                            span= tour.startLocation.description
                         .card__data
                             svg.card__icon
                                 use(xlink:href='/img/icons.svg#icon-calendar')
@@ -43,3 +43,5 @@ block content
                             |
                             span.card__footer-text= `rating (${tour.ratingsQuantity})`
                         a.btn.btn--green.btn--small(href=`/tour/${tour._id}`) Details
+
+        

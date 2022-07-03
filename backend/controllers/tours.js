@@ -2,7 +2,7 @@ const Tour = require("../models/tours");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 
-//middle to get cheapest tours
+//middleware to get cheapest tours
 const TopCheapTours = (req, res, next) => {
   req.query.limit = "5";
   req.query.sort = "-ratingsAverage,price";
@@ -10,7 +10,7 @@ const TopCheapTours = (req, res, next) => {
   next();
 };
 
-const getTours = catchAsync(async (req, res) => {
+const getTours = catchAsync(async (req, res, next) => {
   //BUILD QUERY
   //1a) Filtering
   const queryObj = { ...req.query };
@@ -54,31 +54,32 @@ const getTours = catchAsync(async (req, res) => {
 
   //execute query
   const tours = await query;
-  res.status(200);
-  res.json({
+  res.status(200).json({
     status: "success",
     results: tours.length,
     data: {
       tours,
     },
   });
+  next();
 });
 
 const getTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id)
-  if (!tour)
-    return next(new AppError(`No user with id: ${req.params.id}`, 401));
+  const tour = await Tour.findById(req.params.id);
+  if (!tour) {
+    return next(new AppError("There is no tour with that ID", 401));
+  }
   res.status(200).json({
     status: "success",
     data: {
       tour,
     },
   });
+  next();
 });
 
 const createTour = catchAsync(async (req, res) => {
   const newTour = await Tour.create(req.body);
-  newTour.save();
   res.status(201).json({
     status: "success",
     data: {
@@ -87,7 +88,7 @@ const createTour = catchAsync(async (req, res) => {
   });
 });
 
-const updateTour = catchAsync(async (req, res) => {
+const updateTour = catchAsync(async (req, res, next) => {
   const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
@@ -98,6 +99,7 @@ const updateTour = catchAsync(async (req, res) => {
       tour,
     },
   });
+  next();
 });
 
 const deleteTour = catchAsync(async (req, res) => {

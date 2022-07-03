@@ -1,13 +1,21 @@
 const express = require("express");
 const router = express.Router();
-const { verify } = require("../controllers/auth");
 
-const { overview, base, tourDetail } = require("../controllers/view");
+const {
+  login,
+  signup,
+  overview,
+  tourDetail,
+  base,
+  userAccount,
+} = require("../controllers/view");
+const { isLoggedIn, verify } = require("../controllers/auth");
 
-// router.use(verify);
-
-router.get("/", base);
-router.get("/overview", overview);
-router.get("/tour/:id", tourDetail)
+router.get("/login", login);
+router.get("/signup", signup);
+router.get("/base", isLoggedIn, base);
+router.get("/", isLoggedIn, overview);
+router.get("/tour/:id", isLoggedIn, tourDetail);
+router.get("/me", verify, userAccount);
 
 module.exports = router;

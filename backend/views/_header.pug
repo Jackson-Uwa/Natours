@@ -1,18 +1,22 @@
 header.header 
-  nav.nav.nav--tours 
-    a.nav__el(href='/overview') All tours
-    form.nav__search
-      button.nav__search-btn
-        svg.icon
-          use(xlink:href='img/icons.svg#icon-search')
-      input.nav__search-input(type='text'
+    nav.nav.nav--tours 
+      a.nav__el(href='/') All tours
+      form.nav__search
+        button.nav__search-btn
+          svg.icon
+            use(xlink:href='img/icons.svg#icon-search')
+        input.nav__search-input(type='text'
         placeholder='Search tours')
-  .header__logo 
-    img(src='/img/logo-white.png' alt='Natours Logo')
-  nav.nav.nav--user 
-    a.nav__el(href='#') My bookings
-    a.nav__el(href='#')
-      img.nav__user-img(src='/img/users/emblem.jpg' alt='User photo')
-      span Jackson 
-    button.nav__el.nav__el--cta Sign up
+    .header__logo 
+      img(src='/img/logo-white.png' alt='Natours Logo')
+    nav.nav.nav--user 
+      if user
+        a.nav__el.nav__el--cta Check Bookings
+         a#logout Log out
+         a.nav__el(href='/me')
+          img.nav__user-img(src=`/img/users/${user.photo}` alt=`User ${user.name.split(' ')[1]} `)
+          span= user.name.split(' ')[1]
+      else
+        a.nav__el.nav__el--cta(href='/login') Login
+        a.nav__el.nav__el--cta(href='/signup') Sign up
 
