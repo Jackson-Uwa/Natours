@@ -1,7 +1,64 @@
 const Tour = require("../models/tours");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
+const APIFeatures = require("../utils/apiFeatures");
+const multer = require("multer");
+const sharp = require("sharp");
 
+const multerStorage = multer.memoryStorage();
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb(
+      new AppError("Not an image file, please upload only image files", 400),
+      false
+    );
+  }
+};
+
+// upload.single('image') req.file
+// upload.array('images', 5) req.files
+
+const upload = multer({
+  storage: multerStorage,
+  multerFilter: fileFilter,
+});
+
+const uploadTourImages = upload.fields([
+  { name: "images", maxCount: 3 },
+  { name: "imageCover", maxCount: 1 },
+]);
+
+const resizeTourImages = catchAsync(async (req, res, next) => {
+  if (!req.files.images || !req.files.imageCover) return next();
+  //1 cover image
+  req.body.imageCover = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
+  await sharp(req.files.imageCover[0].buffer)
+    .resize(2000, 1333)
+    .toFormat("jpeg")
+    .jpeg({ quality: 90 })
+    .toFile(`public/img/tours/${req.body.imageCover}`);
+
+  // 2) Images
+  req.body.images = [];
+
+  await Promise.all(
+    req.files.images.map(async (file, i) => {
+      const filename = `tour-${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
+
+      await sharp(file.buffer)
+        .resize(2000, 1333)
+        .toFormat("jpeg")
+        .jpeg({ quality: 90 })
+        .toFile(`public/img/tours/${filename}`);
+
+      req.body.images.push(filename);
+    })
+  );
+
+  next();
+});
 //middleware to get cheapest tours
 const TopCheapTours = (req, res, next) => {
   req.query.limit = "5";
@@ -11,57 +68,20 @@ const TopCheapTours = (req, res, next) => {
 };
 
 const getTours = catchAsync(async (req, res, next) => {
-  //BUILD QUERY
-  //1a) Filtering
-  const queryObj = { ...req.query };
-  const excludedFields = ["page", "sort", "limit", "fields"];
-  excludedFields.forEach((el) => delete queryObj[el]);
-
-  //1b) Advanced Filtering
-  //let queryStr = JSON.stringify(queryObj);
-  //queryStr = queryStr.replace(/\b(gte|gt|lte|lt|in)\b/g, (match) => `$${match}`);
-  // console.log(JSON.parse(queryStr));
-
-  let query = Tour.find(queryObj);
-
-  //2) Sorting
-  if (req.query.sort) {
-    const sortBy = req.query.sort.split(",").join(" ");
-    query = query.sort(sortBy);
-  } else {
-    query = query.sort("-createdAt");
-  }
-
-  //3) Field limiting
-  if (req.query.fields) {
-    const fields = req.query.fields.split(",").join(" ");
-    query = query.select(fields);
-  } else {
-    query = query.select("-__v");
-  }
-
-  //4) Pagination
-  const page = req.query.page * 1 || 1;
-  const limit = req.query.limit * 1 || 100;
-  const skip = (page - 1) * limit;
-
-  query = query.skip(skip).limit(limit);
-
-  if (req.query.page) {
-    const numTours = await Tour.countDocuments();
-    if (skip >= numTours) throw new Error("This page does not exist");
-  }
-
+  const features = new APIFeatures(Tour.find(), req.query)
+    .filter()
+    .sort()
+    .fields()
+    .paginate();
   //execute query
-  const tours = await query;
-  res.status(200).json({
+  const tours = await features.query;
+  return res.status(200).json({
     status: "success",
     results: tours.length,
     data: {
       tours,
     },
   });
-  next();
 });
 
 const getTour = catchAsync(async (req, res, next) => {
@@ -69,18 +89,17 @@ const getTour = catchAsync(async (req, res, next) => {
   if (!tour) {
     return next(new AppError("There is no tour with that ID", 401));
   }
-  res.status(200).json({
+  return res.status(200).json({
     status: "success",
     data: {
       tour,
     },
   });
-  next();
 });
 
 const createTour = catchAsync(async (req, res) => {
   const newTour = await Tour.create(req.body);
-  res.status(201).json({
+  return res.status(201).json({
     status: "success",
     data: {
       tour: newTour,
@@ -93,18 +112,17 @@ const updateTour = catchAsync(async (req, res, next) => {
     new: true,
     runValidators: true,
   });
-  res.status(200).json({
+  return res.status(200).json({
     status: "success",
     data: {
       tour,
     },
   });
-  next();
 });
 
 const deleteTour = catchAsync(async (req, res) => {
   const tour = await Tour.findByIdAndDelete(req.params.id);
-  res.status(204).json({
+  return res.status(204).json({
     status: "success",
     data: {
       tour,
@@ -119,4 +137,6 @@ module.exports = {
   updateTour,
   deleteTour,
   TopCheapTours,
+  uploadTourImages,
+  resizeTourImages,
 };

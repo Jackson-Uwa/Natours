@@ -60,11 +60,10 @@ const getUser = catchAsync(async (req, res, next) => {
   if (!user) {
     return next(new AppError(`No user with ID ${req.params.id}`));
   }
-  res.status(200).json({
+  return res.status(200).json({
     status: "success",
     data: user,
   });
-  next();
 });
 
 const signUp = catchAsync(async (req, res) => {
@@ -88,7 +87,6 @@ const logIn = catchAsync(async (req, res, next) => {
     return next(new AppError("Incorrect email or password", 401));
   }
   createSendToken(user, 200, res);
-  next();
 });
 
 const logOut = (req, res) => {

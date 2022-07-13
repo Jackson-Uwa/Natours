@@ -9,6 +9,8 @@ const {
   updateTour,
   deleteTour,
   TopCheapTours,
+  uploadTourImages,
+  resizeTourImages,
 } = require("../controllers/tours");
 
 router.use(verify);
@@ -22,8 +24,14 @@ router.get("/:id", getTour);
 
 router.post("/", createTour);
 
-router.patch("/:id", updateTour);
+router.patch(
+  "/:id",
+  restrictTo("admin"),
+  uploadTourImages,
+  resizeTourImages,
+  updateTour
+);
 
-router.delete("/:id", deleteTour);
+router.delete("/:id", restrictTo("admin"), deleteTour);
 
 module.exports = router;

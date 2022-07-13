@@ -14,7 +14,12 @@ const {
   updatePassword,
 } = require("../controllers/auth");
 
-const { updateMe, deleteMe } = require("../controllers/user");
+const {
+  uploadPhoto,
+  resizeUserPhoto,
+  updateMe,
+  deleteMe,
+} = require("../controllers/user");
 
 router.post("/login", logIn);
 router.post("/signup", signUp);
@@ -24,7 +29,7 @@ router.use(verify);
 router.post("/forgot-password", forgotPassword);
 router.patch("/reset-password/:token", resetPassword);
 router.patch("/update-my-password", updatePassword);
-router.patch("/update-me", updateMe);
+router.patch("/update-me", uploadPhoto, resizeUserPhoto, updateMe);
 router.delete("/delete-me", deleteMe);
 router.get("/", getUsers);
 router.get("/:id", getUser);

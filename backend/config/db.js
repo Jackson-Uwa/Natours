@@ -4,7 +4,9 @@ const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.DATABASE, {
       useNewUrlParser: true,
-      useUnifiedTopology: true
+      useUnifiedTopology: true,
+      useCreateIndex: true,
+      useFindAndModify: false,
     });
     console.log(`DATABASE CONNECTED ON: ${conn.connection.host}:27017`);
   } catch (err) {
