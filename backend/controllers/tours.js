@@ -1,5 +1,5 @@
 const Tour = require("../models/tours");
-const catchAsync = require("../utils/catchAsync");
+const asyncHandler = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const APIFeatures = require("../utils/apiFeatures");
 const multer = require("multer");
@@ -30,7 +30,7 @@ const uploadTourImages = upload.fields([
   { name: "imageCover", maxCount: 1 },
 ]);
 
-const resizeTourImages = catchAsync(async (req, res, next) => {
+const resizeTourImages = asyncHandler(async (req, res, next) => {
   if (!req.files.images || !req.files.imageCover) return next();
   //1 cover image
   req.body.imageCover = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
@@ -67,7 +67,7 @@ const TopCheapTours = (req, res, next) => {
   next();
 };
 
-const getTours = catchAsync(async (req, res, next) => {
+const getTours = asyncHandler(async (req, res, next) => {
   const features = new APIFeatures(Tour.find(), req.query)
     .filter()
     .sort()
@@ -75,7 +75,7 @@ const getTours = catchAsync(async (req, res, next) => {
     .paginate();
   //execute query
   const tours = await features.query;
-  return res.status(200).json({
+  res.status(200).json({
     status: "success",
     results: tours.length,
     data: {
@@ -84,12 +84,12 @@ const getTours = catchAsync(async (req, res, next) => {
   });
 });
 
-const getTour = catchAsync(async (req, res, next) => {
+const getTour = asyncHandler(async (req, res, next) => {
   const tour = await Tour.findById(req.params.id);
   if (!tour) {
     return next(new AppError("There is no tour with that ID", 401));
   }
-  return res.status(200).json({
+  res.status(200).json({
     status: "success",
     data: {
       tour,
@@ -97,7 +97,7 @@ const getTour = catchAsync(async (req, res, next) => {
   });
 });
 
-const createTour = catchAsync(async (req, res) => {
+const createTour = asyncHandler(async (req, res) => {
   const newTour = await Tour.create(req.body);
   return res.status(201).json({
     status: "success",
@@ -107,7 +107,7 @@ const createTour = catchAsync(async (req, res) => {
   });
 });
 
-const updateTour = catchAsync(async (req, res, next) => {
+const updateTour = asyncHandler(async (req, res, next) => {
   const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
@@ -120,7 +120,7 @@ const updateTour = catchAsync(async (req, res, next) => {
   });
 });
 
-const deleteTour = catchAsync(async (req, res) => {
+const deleteTour = asyncHandler(async (req, res) => {
   const tour = await Tour.findByIdAndDelete(req.params.id);
   return res.status(204).json({
     status: "success",

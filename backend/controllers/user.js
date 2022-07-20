@@ -2,7 +2,7 @@ const multer = require("multer");
 const sharp = require("sharp");
 const User = require("../models/users");
 const AppError = require("../utils/appError");
-const catchAsync = require("../utils/catchAsync");
+const asyncHandler = require("../utils/catchAsync");
 
 // const multerStorage = multer.diskStorage({
 //   destination: (req, file, cb) => {
@@ -38,7 +38,7 @@ const filterObj = (obj, ...allowedFields) => {
 
 const uploadPhoto = upload.single("photo");
 
-const resizeUserPhoto = catchAsync(async (req, res, next) => {
+const resizeUserPhoto = asyncHandler(async (req, res, next) => {
   if (!req.file) return next();
 
   req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
@@ -52,7 +52,7 @@ const resizeUserPhoto = catchAsync(async (req, res, next) => {
   next();
 });
 
-const updateMe = catchAsync(async (req, res, next) => {
+const updateMe = asyncHandler(async (req, res, next) => {
   if (req.body.password || req.body.confirmPassword) {
     return next(
       new AppError(
@@ -78,7 +78,7 @@ const updateMe = catchAsync(async (req, res, next) => {
   next();
 });
 
-const deleteMe = catchAsync(async (req, res, next) => {
+const deleteMe = asyncHandler(async (req, res, next) => {
   await User.findByIdAndUpdate(req.user.id, { active: false });
   res.status(204).json({
     status: "success",

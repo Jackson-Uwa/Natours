@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 const pug = require("pug");
-const htmlToText = require("html-to-text");
+const { htmlToText } = require("html-to-text");
 
 module.exports = class Email {
   constructor(user, url) {
@@ -12,16 +12,22 @@ module.exports = class Email {
 
   newTransport() {
     if (process.env.NODE_ENV === "production") {
-      return 1;
-    }
-    return nodemailer.createTransport({
-      host: process.env.EMAIL_HOST,
-      port: process.env.EMAIL_PORT,
-      auth: {
-        user: process.env.EMAIL_USERNAME,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    });
+      return nodemailer.createTransport({
+        service: "SendGrid",
+        auth: {
+          user: '',
+          pass: ''
+        }
+      });
+    } else
+      return nodemailer.createTransport({
+        host: process.env.EMAIL_HOST,
+        port: process.env.EMAIL_PORT,
+        auth: {
+          user: process.env.EMAIL_USERNAME,
+          pass: process.env.EMAIL_PASSWORD,
+        },
+      });
   }
 
   async send(template, subject) {
@@ -36,7 +42,7 @@ module.exports = class Email {
       to: this.to,
       subject,
       html,
-      text: htmlToText.fromString(html),
+      text: htmlToText(html),
     };
 
     await this.newTransport().sendMail(mailOptions);

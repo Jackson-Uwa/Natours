@@ -1,3 +1,40 @@
+// import "@babel/polyfill";
+
+// const Stripe = require("stripe");
+
+// const stripe = Stripe(
+//   "pk_test_51LLoYxCbWCyNd5x6C1yLQvweR4jlqUrA569XoccuGkuiwJ37ibgSCk3TzMcNh2DIvm0lxgTMnJahhCWyFxgqzo3A00a2piXi01"
+// );
+// const stripe = Stripe(
+//   "pk_test_51LLoYxCbWCyNd5x6C1yLQvweR4jlqUrA569XoccuGkuiwJ37ibgSCk3TzMcNh2DIvm0lxgTMnJahhCWyFxgqzo3A00a2piXi01",
+//   { locale: "fr" }
+// );
+
+const bookTour = async (tourId) => {
+  try {
+    const session = await axios(
+      `http://127.0.0.1:8000/api/v1/bookings/checkout-session/${tourId}`
+    );
+    console.log(session);
+    await stripe.redirectToCheckOut({
+      sessionId: session.data.session.id,
+    });
+  } catch (err) {
+    console.log(err);
+    showAlert("error", err);
+  }
+};
+const bookBtn = document.getElementById("book-tour");
+if (bookBtn) {
+  bookBtn.addEventListener("click", (event) => {
+    event.target.textContent = "Processing...";
+    const { tourId } = event.target.dataset;
+    // const tourId = event.target.dataset.tourId;
+    console.log(tourId);
+    bookTour(tourId);
+  });
+}
+
 const hideAlert = () => {
   const el = document.querySelector(".alert");
   if (el) el.parentElement.removeChild(el);

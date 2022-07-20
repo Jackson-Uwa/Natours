@@ -1,19 +1,19 @@
 const Tour = require("../models/tours");
 // const User = require("../models/users");
 const AppError = require("../utils/appError");
-const catchAsync = require("../utils/catchAsync");
+const asyncHandler = require("../utils/catchAsync");
 
 const base = (req, res, next) => {
   res.render("base");
 };
 
-const overview = catchAsync(async (req, res, next) => {
+const overview = asyncHandler(async (req, res, next) => {
   const tours = await Tour.find();
 
   res.render("overview", { tours, title: "Natours | All Tours" });
 });
 
-const tourDetail = catchAsync(async (req, res, next) => {
+const tourDetail = asyncHandler(async (req, res, next) => {
   const tour = await Tour.findById(req.params.id);
   if (!tour) {
     return next(new AppError("There is no tour with that ID", 401));

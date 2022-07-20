@@ -1,8 +1,8 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/users");
 const AppError = require("../utils/appError");
-const catchAsync = require("../utils/catchAsync");
-const sendEmail = require("../utils/email");
+const asyncHandler = require("../utils/catchAsync");
+const Email = require("../utils/email");
 const crypto = require("crypto");
 
 const signToken = (id) => {
@@ -33,7 +33,7 @@ const createSendToken = (user, statusCode, res) => {
   });
 };
 
-const getUsers = catchAsync(async (req, res) => {
+const getUsers = asyncHandler(async (req, res) => {
   const users = await User.find();
   return res.status(200).json({
     status: "success",
@@ -44,7 +44,7 @@ const getUsers = catchAsync(async (req, res) => {
   });
 });
 
-const patchUser = catchAsync(async (req, res, next) => {
+const patchUser = asyncHandler(async (req, res, next) => {
   const user = await User.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
@@ -55,28 +55,32 @@ const patchUser = catchAsync(async (req, res, next) => {
   });
 });
 
-const getUser = catchAsync(async (req, res, next) => {
+const getUser = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.params.id);
   if (!user) {
     return next(new AppError(`No user with ID ${req.params.id}`));
   }
-  return res.status(200).json({
+  res.status(200).json({
     status: "success",
     data: user,
   });
+  next();
 });
 
-const signUp = catchAsync(async (req, res) => {
+const signUp = asyncHandler(async (req, res) => {
   const newUser = await User.create({
     name: req.body.name,
     email: req.body.email,
     password: req.body.password,
     confirmPassword: req.body.confirmPassword,
   });
+  const url = `${req.protocol}://${req.get("host")}/me`;
+  console.log(url);
+  await new Email(newUser, url).sendWelcome();
   createSendToken(newUser, 201, res);
 });
 
-const logIn = catchAsync(async (req, res, next) => {
+const logIn = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password) {
     next(new AppError("Please provide email and password", 400));
@@ -149,7 +153,7 @@ const restrictTo = (...roles) => {
   };
 };
 
-const forgotPassword = catchAsync(async (req, res, next) => {
+const forgotPassword = asyncHandler(async (req, res, next) => {
   // 1) Get user based on POSTed email
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
@@ -161,18 +165,12 @@ const forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   // 3) Send it to user's email
-  const resetURL = `${req.protocol}://${req.get(
-    "host"
-  )}/api/v1/users/resetPassword/${resetToken}`;
-
-  const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
-
   try {
-    await sendEmail({
-      email: user.email,
-      subject: "Your password reset token (valid for 10 min)",
-      message,
-    });
+    const resetURL = `${req.protocol}://${req.get(
+      "host"
+    )}/api/v1/users/resetPassword/${resetToken}`;
+
+    await new Email(user, resetURL).sendReset();
 
     res.status(200).json({
       status: "success",
@@ -190,7 +188,7 @@ const forgotPassword = catchAsync(async (req, res, next) => {
   }
 });
 
-const resetPassword = catchAsync(async (req, res, next) => {
+const resetPassword = asyncHandler(async (req, res, next) => {
   const hashedToken = crypto
     .createHash("sha256")
     .update(req.params.token)
@@ -210,7 +208,7 @@ const resetPassword = catchAsync(async (req, res, next) => {
   createSendToken(user, 200, res);
 });
 
-const updatePassword = catchAsync(async (req, res, next) => {
+const updatePassword = asyncHandler(async (req, res, next) => {
   // 1) Get user from collection
   const user = await User.findById(req.user.id).select("+password");
 

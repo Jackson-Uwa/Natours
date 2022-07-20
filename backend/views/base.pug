@@ -8,6 +8,7 @@ html
         link(rel='stylesheet' href='webFonts/css/all.css')
         link(rel='stylesheet' href='/css/style.css')
         link(rel='icon' href='/img/favicon.png')
+        //- script(src='https://js.stripe.com/v3/')
         title #{title}
 
     body 
@@ -15,10 +16,12 @@ html
     include _header
 
     block content
+        // CONTENT
 
         // footer
     include _footer
 
         script(src='/js/bundle.js')
+        script(src='https://js.stripe.com')
         script(src='https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js')
-        //- script(src='/js/mapbox.js')
+        script(src='/js/mapbox.js')

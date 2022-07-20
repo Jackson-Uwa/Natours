@@ -12,7 +12,7 @@ const mongoSanitize = require("express-mongo-sanitize");
 
 const path = require("path");
 const cors = require("cors");
-const cookieParser = require('cookie-parser')
+const cookieParser = require("cookie-parser");
 
 // Connect to DataBase
 connectDB();
@@ -67,12 +67,13 @@ app.use("/", require("./routes/view"));
 app.use("/api/v1/reviews", require("./routes/reviews"));
 app.use("/api/v1/users", require("./routes/users"));
 app.use("/api/v1/tours", require("./routes/tours"));
+app.use("/api/v1/bookings", require("./routes/bookings"));
 
 //operational error to handle undefined routes
 app.all("*", (req, res, next) => {
   // next(new AppError(`Cant find ${req.originalUrl} on this server!`, 404));
   if (req.accepts("json")) {
-    res.render('error', {title: "Page 404"})
+    res.render("error", { title: "Page 404" });
   }
   if (req.accepts("html")) {
     res.sendFile(path.join(__dirname, "views", "404.html"));
