@@ -4,6 +4,7 @@
   "description": "Learning node, express and mongoDB",
   "main": "server.js",
   "scripts": {
+    "start": "node backend/server.js",
     "start:prod": "NODE_ENV=production node backend/server.js",
     "server": "nodemon backend/server.js",
     "debug": "ndb backend/server.js",
@@ -15,6 +16,7 @@
     "@babel/polyfill": "^7.12.1",
     "axios": "^0.27.2",
     "bcryptjs": "^2.4.3",
+    "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^7.0.0",

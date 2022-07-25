@@ -41,7 +41,6 @@ const reviewSchema = new mongoose.Schema(
 //   next()
 // });
 
-
 reviewSchema.pre(/^find/, function (next) {
   // this.populate({
   //   path: "tour",

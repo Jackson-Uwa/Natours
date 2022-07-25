@@ -22,7 +22,7 @@ const createSendToken = (user, statusCode, res) => {
   if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
 
   res.cookie("jwt", token, cookieOptions);
-  console.log({ jwt: token });
+  // console.log({ jwt: token });
   user.password = undefined;
   res.status(statusCode).json({
     status: "success",
@@ -60,11 +60,10 @@ const getUser = asyncHandler(async (req, res, next) => {
   if (!user) {
     return next(new AppError(`No user with ID ${req.params.id}`));
   }
-  res.status(200).json({
+  return res.status(200).json({
     status: "success",
     data: user,
   });
-  next();
 });
 
 const signUp = asyncHandler(async (req, res) => {

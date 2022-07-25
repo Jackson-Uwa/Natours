@@ -1,6 +1,35 @@
+const stripe = window.Stripe(
+  "pk_test_51LLoYxCbWCyNd5x6C1yLQvweR4jlqUrA569XoccuGkuiwJ37ibgSCk3TzMcNh2DIvm0lxgTMnJahhCWyFxgqzo3A00a2piXi01",
+  { locale: "fr" }
+);
+
+const bookBtn = document.getElementById("book-tour");
+if (bookBtn) {
+  bookBtn.addEventListener("click", (event) => {
+    event.target.textContent = "Processing...";
+    const { tourId } = event.target.dataset;
+    // const tourId = event.target.dataset.tourId;
+    console.log(tourId);
+    bookTour(tourId);
+  });
+}
+
+const bookTour = async (tourId) => {
+  try {
+    const session = await axios(`/api/v1/bookings/checkout-session/${tourId}`);
+    console.log(session);
+    await stripe.redirectToCheckout({
+      sessionId: session.data.session.id,
+    });
+  } catch (err) {
+    // console.log(err);
+    showAlert("error", err);
+  }
+};
+
 // document.getElementById('map').insertAdjacentHTML = '<h1>Map</h1>'
 const locations = JSON.parse(document.getElementById("map").dataset.locations);
-console.log(locations);
+// console.log(locations);
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiamFja3Nvbi1peWFtdSIsImEiOiJjbDVxbHRsaDIxODNtM2puenVpMzZtOHV4In0.AejfqSm4fgrl27NCVdk8rQ";

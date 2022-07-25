@@ -4,7 +4,7 @@ const asyncHandler = require("../utils/catchAsync");
 
 exports.getReviews = asyncHandler(async (req, res, next) => {
   const reviews = await Review.find();
-  res.status(200).json({
+  return res.status(200).json({
     status: "success",
     results: reviews.length,
     data: {
@@ -15,7 +15,7 @@ exports.getReviews = asyncHandler(async (req, res, next) => {
 
 exports.getReview = asyncHandler(async (req, res, next) => {
   const review = await Review.findById(req.params.id);
-  res.status(200).json({
+  return res.status(200).json({
     status: "success",
     data: review,
   });

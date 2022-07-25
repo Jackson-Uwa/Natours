@@ -75,7 +75,7 @@ const getTours = asyncHandler(async (req, res, next) => {
     .paginate();
   //execute query
   const tours = await features.query;
-  res.status(200).json({
+  return res.status(200).json({
     status: "success",
     results: tours.length,
     data: {
@@ -89,7 +89,7 @@ const getTour = asyncHandler(async (req, res, next) => {
   if (!tour) {
     return next(new AppError("There is no tour with that ID", 401));
   }
-  res.status(200).json({
+  return res.status(200).json({
     status: "success",
     data: {
       tour,

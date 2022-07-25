@@ -152,5 +152,5 @@ tourSchema.pre(/^find/, function (next) {
 //   this.slug = slugify(this.name, { lower: true });
 //   next();
 // });
-
-module.exports = mongoose.model("Tour", tourSchema);
+const Tour = mongoose.model("Tour", tourSchema);
+module.exports = Tour;

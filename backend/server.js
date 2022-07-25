@@ -4,6 +4,8 @@ const app = express();
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./utils/globalError");
 const connectDB = require("./config/db");
+
+const compression = require("compression");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const xss = require("xss-clean");
@@ -31,6 +33,7 @@ app.use(
 );
 
 app.use(cookieParser());
+app.use(compression())
 // app.use((req, res, next) => {
 //   console.log(req.cookies);
 //   next();

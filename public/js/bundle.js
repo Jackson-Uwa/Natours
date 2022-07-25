@@ -1,39 +1,33 @@
-// import "@babel/polyfill";
+// "@babel/polyfill"
 
 // const Stripe = require("stripe");
-
-// const stripe = Stripe(
-//   "pk_test_51LLoYxCbWCyNd5x6C1yLQvweR4jlqUrA569XoccuGkuiwJ37ibgSCk3TzMcNh2DIvm0lxgTMnJahhCWyFxgqzo3A00a2piXi01"
-// );
-// const stripe = Stripe(
+// const stripe = new Stripe(
 //   "pk_test_51LLoYxCbWCyNd5x6C1yLQvweR4jlqUrA569XoccuGkuiwJ37ibgSCk3TzMcNh2DIvm0lxgTMnJahhCWyFxgqzo3A00a2piXi01",
 //   { locale: "fr" }
 // );
 
-const bookTour = async (tourId) => {
-  try {
-    const session = await axios(
-      `http://127.0.0.1:8000/api/v1/bookings/checkout-session/${tourId}`
-    );
-    console.log(session);
-    await stripe.redirectToCheckOut({
-      sessionId: session.data.session.id,
-    });
-  } catch (err) {
-    console.log(err);
-    showAlert("error", err);
-  }
-};
-const bookBtn = document.getElementById("book-tour");
-if (bookBtn) {
-  bookBtn.addEventListener("click", (event) => {
-    event.target.textContent = "Processing...";
-    const { tourId } = event.target.dataset;
-    // const tourId = event.target.dataset.tourId;
-    console.log(tourId);
-    bookTour(tourId);
-  });
-}
+// const bookTour = async (tourId) => {
+//   try {
+//     const session = await axios(`/api/v1/bookings/checkout-session/${tourId}`);
+//     console.log(session);
+//     await stripe.redirectToCheckOut({
+//       sessionId: session.data.session.id,
+//     });
+//   } catch (err) {
+//     // console.log(err);
+//     showAlert("error", err);
+//   }
+// };
+// const bookBtn = document.getElementById("book-tour");
+// if (bookBtn) {
+//   bookBtn.addEventListener("click", (event) => {
+//     event.target.textContent = "Processing...";
+//     const { tourId } = event.target.dataset;
+//     // const tourId = event.target.dataset.tourId;
+//     console.log(tourId);
+//     bookTour(tourId);
+//   });
+// }
 
 const hideAlert = () => {
   const el = document.querySelector(".alert");
@@ -52,7 +46,7 @@ const login = async (email, password) => {
   try {
     const res = await axios({
       method: "POST",
-      url: "http://127.0.0.1:8000/api/v1/users/login",
+      url: "/api/v1/users/login",
       data: {
         email,
         password,
@@ -68,15 +62,14 @@ const login = async (email, password) => {
     showAlert("error", err.response.data.message);
   }
 };
+
 const loginForm = document.querySelector(".form-login");
 if (loginForm) {
   loginForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
-    // const form = new FormData();
-    // form.append("email", document.getElementById("email").value);
-    // form.append("password", document.getElementById("password").value);
+
     login(email, password);
   });
 }
@@ -85,7 +78,7 @@ const signUp = async (name, email, password, confirmPassword) => {
   try {
     const res = await axios({
       method: "POST",
-      url: "http://127.0.0.1:8000/api/v1/users/signup",
+      url: "/api/v1/users/signup",
       data: {
         name,
         email,
@@ -108,20 +101,12 @@ const signForm = document.querySelector(".sign-up");
 if (signForm) {
   signForm.addEventListener("submit", (event) => {
     event.preventDefault();
-    // const form = new FormData();
-    // form.append("name", document.getElementById("name").value);
-    // form.append("email", document.getElementById("email").value);
-    // form.append("password", document.getElementById("password").value);
-    // form.append(
-    //   "confirmPassword",
-    //   document.getElementById("confirm_password").value
-    // );
+
     const name = document.getElementById("name").value;
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
     const confirmPassword = document.getElementById("confirm_password").value;
-    // form.append("photo", document.getElementById("photo").files[0]);
-    console.log(name, email, password, confirmPassword);
+
     signUp(name, email, password, confirmPassword);
   });
 }
@@ -130,8 +115,8 @@ const updateSettings = async (data, type) => {
   try {
     const url =
       type === "password"
-        ? "http://127.0.0.1:8000/api/v1/users/update-my-password"
-        : "http://127.0.0.1:8000/api/v1/users/update-me";
+        ? "/api/v1/users/update-my-password"
+        : "/api/v1/users/update-me";
 
     const res = await axios({
       method: "PATCH",
@@ -155,7 +140,7 @@ if (userForm) {
     form.append("name", document.getElementById("name").value);
     form.append("email", document.getElementById("email").value);
     form.append("photo", document.getElementById("photo").files[0]);
-    console.log(form);
+
     updateSettings(form, "data");
   });
 }
@@ -188,7 +173,7 @@ if (logoutBtn) {
     try {
       const res = await axios({
         method: "GET",
-        url: "http://127.0.0.1:8000/api/v1/users/logout",
+        url: "/api/v1/users/logout",
       });
       if ((res.data.status = "success")) location.reload(true);
       showAlert("success", "Logged Out");

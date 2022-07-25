@@ -11,7 +11,7 @@ header.header
       img(src='/img/logo-white.png' alt='Natours Logo')
     nav.nav.nav--user 
       if user
-        a.nav__el.nav__el--cta Check Bookings
+        a.nav__el.nav__el--cta(href='/my-tours') Check Bookings
          a#logout Log out
          a.nav__el(href='/me')
           img.nav__user-img(src=`/img/users/${user.photo}` alt=`User ${user.name.split(' ')[1]} `)
