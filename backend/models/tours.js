@@ -148,9 +148,10 @@ tourSchema.pre(/^find/, function (next) {
   next();
 });
 
-// tourSchema.pre(/^find/, function (next) {
-//   this.slug = slugify(this.name, { lower: true });
-//   next();
-// });
+tourSchema.pre("save", function (next) {
+  this.slug = slugify(this.name, { lower: true });
+  next();
+});
+
 const Tour = mongoose.model("Tour", tourSchema);
 module.exports = Tour;
