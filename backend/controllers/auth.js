@@ -73,9 +73,9 @@ const signUp = asyncHandler(async (req, res) => {
     password: req.body.password,
     confirmPassword: req.body.confirmPassword,
   });
-  const url = `${req.protocol}://${req.get("host")}/me`;
-  console.log(url);
-  await new Email(newUser, url).sendWelcome();
+  // const url = `${req.protocol}://${req.get("host")}/me`;
+  // console.log(url);
+  // await new Email(newUser, url).sendWelcome();
   createSendToken(newUser, 201, res);
 });
 

@@ -142,7 +142,7 @@ tourSchema.pre(/^find/, function (next) {
 
   this.populate({
     path: "reviews",
-    select: "-__v",
+    select: "review",
   });
 
   next();
