@@ -8,7 +8,7 @@ const connectDB = async () => {
       useCreateIndex: true,
       useFindAndModify: false,
     });
-    console.log(`DATABASE CONNECTED ON: ${conn.connection.host}:27017`);
+    console.log(`DATABASE CONNECTED ON: ${conn.connection.host}`);
   } catch (err) {
     console.log(err);
     process.exit(1);
