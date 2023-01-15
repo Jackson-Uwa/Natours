@@ -13,7 +13,7 @@ const {
   resizeTourImages,
 } = require("../controllers/tours");
 
-router.use(verify);
+// router.use(verify);
 
 //middleware to get cheapest tours
 router.get("/top-cheap-tours", TopCheapTours, getTours);

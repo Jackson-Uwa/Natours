@@ -14,8 +14,8 @@ header.header
         a.nav__el.nav__el--cta(href='/my-tours') Check Bookings
          a#logout Log out
          a.nav__el(href='/me')
-          img.nav__user-img(src=`/img/users/${user.photo}` alt=`User ${user.name.split(' ')[1]} `)
-          span= user.name.split(' ')[1]
+          img.nav__user-img(src=`/img/users/${user.photo}` alt=`User ${user.name.split(' ')[0]} `)
+          span= user.name.split(' ')[0]
       else
         a.nav__el.nav__el--cta(href='/login') Login
         a.nav__el.nav__el--cta(href='/signup') Sign up

@@ -175,7 +175,7 @@ if (logoutBtn) {
         method: "GET",
         url: "/api/v1/users/logout",
       });
-      if ((res.data.status = "success")) location.reload(true);
+      if ((res.data.status = "success")) location.assign('/');
       showAlert("success", "Logged Out");
     } catch (err) {
       showAlert("error", err.response.data.message);

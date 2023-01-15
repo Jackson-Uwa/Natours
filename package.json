@@ -13,7 +13,6 @@
   "author": "Jackson Iyamu",
   "license": "ISC",
   "dependencies": {
-    "@babel/polyfill": "^7.12.1",
     "axios": "^0.27.2",
     "bcryptjs": "^2.4.3",
     "compression": "^1.7.4",
@@ -39,8 +38,7 @@
     "xss-clean": "^0.1.1"
   },
   "devDependencies": {
-    "nodemon": "^2.0.15",
-    "parcel-bundler": "^1.12.5"
+    "nodemon": "^2.0.15"
   },
   "engines": {
     "node": ">=10.0.0"

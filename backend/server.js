@@ -35,7 +35,7 @@ app.use(
 app.use(cookieParser());
 app.use(compression())
 // app.use((req, res, next) => {
-//   console.log(req.cookies);
+//   console.log({cookies:req.cookies});
 //   next();
 // });
 
@@ -76,7 +76,7 @@ app.use("/api/v1/bookings", require("./routes/bookings"));
 app.all("*", (req, res, next) => {
   // next(new AppError(`Cant find ${req.originalUrl} on this server!`, 404));
   if (req.accepts("json")) {
-    res.render("error", { title: "Page 404" });
+    return res.render("error", { title: "Page 404" });
   }
   if (req.accepts("html")) {
     res.sendFile(path.join(__dirname, "views", "404.html"));

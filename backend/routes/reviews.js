@@ -5,7 +5,7 @@ const { verify } = require("../controllers/auth");
 
 const reviewController = require("../controllers/review");
 
-router.use(verify);
+// router.use(verify);
 router.get("/", reviewController.getReviews);
 router.get("/:id", reviewController.getReview);
 router.post("/", reviewController.addReview);
