@@ -1,8 +1,8 @@
-const jwt = require("jsonwebtoken");
 const User = require("../models/users");
 const AppError = require("../utils/appError");
 const asyncHandler = require("../utils/catchAsync");
 const Email = require("../utils/email");
+const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 
 const signToken = (id) => {
@@ -22,9 +22,7 @@ const createSendToken = (user, statusCode, res) => {
   if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
 
   res.cookie("jwt", token, cookieOptions);
-  // console.log({ jwt: token });
-  user.password = undefined;
-  res.status(statusCode).json({
+  res.status(200).json({
     status: "success",
     token,
     data: {
