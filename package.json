@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node backend/server.js",
+    "build": "npm i",
     "start:prod": "NODE_ENV=production node backend/server.js",
     "server": "nodemon backend/server.js",
     "debug": "ndb backend/server.js",
